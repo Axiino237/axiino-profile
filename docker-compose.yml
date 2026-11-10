@@ -1,0 +1,41 @@
+services:
+  # Frontend UI Application
+  app:
+    build:
+      context: .
+      target: dev
+    container_name: axiino-brochure-ui
+    ports:
+      - "3050:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+      - VITE_PORT=3000
+    depends_on:
+      - postgres
+    restart: unless-stopped
+
+  # PostgreSQL Database (Configured for future backend & CMS)
+  postgres:
+    image: postgres:16-alpine
+    container_name: axiino-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-axiino_admin}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-axiino_secret_2026}
+      POSTGRES_DB: ${POSTGRES_DB:-axiino_brochure}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-axiino_admin} -d ${POSTGRES_DB:-axiino_brochure}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
