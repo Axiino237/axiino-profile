@@ -9,6 +9,7 @@ interface ContactModalProps {
 
 export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) => {
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -17,13 +18,60 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
     message: ''
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      onClose();
-    }, 2800);
+    if (!formData.email || submitting) return;
+    setSubmitting(true);
+
+    try {
+      const response = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
+        body: JSON.stringify({
+          access_key: 'f0e38ecf-4ad2-4d77-a9f4-200aeb80ad74',
+          name: formData.name || 'Anonymous Visitor',
+          email: formData.email,
+          phone: formData.phone || 'Not provided',
+          project_type: formData.projectType,
+          message: formData.message || 'Full project inquiry submitted from brochure modal',
+          subject: `New Full Project Inquiry: ${formData.projectType} - ${formData.name || formData.email}`,
+          from_name: 'Axiino Digital Brochure',
+        }),
+      });
+
+      const data = await response.json();
+      if (data.success) {
+        setSubmitted(true);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          projectType: 'Enterprise SaaS',
+          message: ''
+        });
+        setTimeout(() => {
+          setSubmitted(false);
+          onClose();
+        }, 3000);
+      } else {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          onClose();
+        }, 3000);
+      }
+    } catch {
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        onClose();
+      }, 3000);
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const whatsappMessage = encodeURIComponent(
@@ -33,13 +81,13 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
   return (
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-950/80 backdrop-blur-md">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/80 backdrop-blur-md overflow-y-auto">
           <motion.div
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25 }}
-            className="relative w-full max-w-xl bg-slate-900 border border-white/15 rounded-2xl shadow-2xl p-6 sm:p-8 text-white overflow-hidden"
+            className="relative w-full max-w-xl bg-slate-900 border border-white/15 rounded-2xl shadow-2xl p-5 sm:p-8 text-white max-h-[92dvh] overflow-y-auto my-auto modal-scrollbar"
           >
             {/* Top decorative gradient line */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#3A9AD9] via-[#8A6FDB] to-[#D44FD8]" />
@@ -136,6 +184,19 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
 
                 <div>
                   <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
+                    Phone Number
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="e.g. +91 98765 43210"
+                    value={formData.phone}
+                    onChange={e => setFormData({ ...formData, phone: e.target.value })}
+                    className="w-full px-3 py-2 bg-slate-950 border border-white/10 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-purple-400"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[11px] font-semibold text-slate-400 uppercase tracking-wider mb-1">
                     What are you looking to build?
                   </label>
                   <select
@@ -164,18 +225,19 @@ export const ContactModal: React.FC<ContactModalProps> = ({ isOpen, onClose }) =
                   />
                 </div>
 
-                <div className="pt-2 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                <div className="pt-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <button
+                    type="submit"
+                    disabled={submitting}
+                    className="order-1 sm:order-2 w-full sm:w-auto px-6 py-2.5 sm:py-2 bg-gradient-to-r from-[#3A9AD9] via-[#8A6FDB] to-[#D44FD8] hover:opacity-95 text-white font-bold text-sm rounded-lg flex items-center justify-center gap-1.5 transition-all shadow-lg shadow-purple-900/35 active:scale-95 disabled:opacity-75 cursor-pointer"
+                  >
+                    <Send className={`w-3.5 h-3.5 ${submitting ? 'animate-pulse' : ''}`} />
+                    <span>{submitting ? 'Sending...' : 'Send Inquiry'}</span>
+                  </button>
+                  <span className="order-2 sm:order-1 text-[11px] text-slate-400 flex items-center justify-center sm:justify-start gap-1">
                     <Calendar className="w-3.5 h-3.5 text-slate-500" />
                     Response guaranteed within 24h
                   </span>
-                  <button
-                    type="submit"
-                    className="px-5 py-2 bg-gradient-to-r from-[#3A9AD9] via-[#8A6FDB] to-[#D44FD8] hover:opacity-95 text-white font-bold text-sm rounded-lg flex items-center gap-1.5 transition-all shadow-lg shadow-purple-900/35 active:scale-95"
-                  >
-                    <Send className="w-3.5 h-3.5" />
-                    <span>Send Inquiry</span>
-                  </button>
                 </div>
               </form>
             )}

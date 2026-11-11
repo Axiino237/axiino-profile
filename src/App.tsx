@@ -164,7 +164,7 @@ export function App() {
 
 
   return (
-    <div className="relative w-screen min-h-[100dvh] bg-[#E6EFF8] font-sans">
+    <div className="relative w-full min-h-screen overflow-x-hidden bg-[#E6EFF8] font-sans">
       {/* 1. Primary Natural Experience: Minimal Cover + Rich Scroll Documents */}
       {viewMode === 'scroll' && (
         <ScrollView
