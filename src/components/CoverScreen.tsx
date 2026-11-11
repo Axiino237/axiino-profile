@@ -71,7 +71,7 @@ export const CoverScreen: React.FC<CoverScreenProps> = ({
       <header className="relative z-20 w-full px-5 sm:px-10 lg:px-16 pt-5 sm:pt-7 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div className="h-9 sm:h-11 w-auto flex items-center justify-center">
-            <img src="/axiino-logo.png" alt="Axiino Logo" className="h-full w-auto object-contain drop-shadow" />
+            <img src="/axiino-logo.png" alt="Axiino Logo" className="h-full w-auto object-contain drop-shadow" decoding="async" />
           </div>
           <div className="flex flex-col">
             <span className="font-display font-black text-xl sm:text-2xl tracking-tight text-white leading-none">

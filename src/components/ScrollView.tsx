@@ -3,9 +3,10 @@ import { motion, AnimatePresence, useReducedMotion, useMotionValue, useSpring, u
 import { ShowcaseItem } from '../types';
 import { PORTFOLIO_CARDS, PortfolioCardItem } from '../data/portfolioData';
 import { CASE_STUDIES_DATA } from '../data/caseStudiesData';
-import { CaseStudyPanel } from './CaseStudyPanel';
 import { WordReveal } from './WordReveal';
 import { SERVICES_DATA, ServiceItem } from '../data/servicesData';
+
+import { CaseStudyPanel } from './CaseStudyPanel';
 import { 
   Sparkles, 
   ArrowUpRight, 
@@ -166,28 +167,32 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
     if (!isCoverOpen) return;
 
     let animId: number;
+    let lastDriftTick = 0;
 
-    // Autonomous living drift animation loop (active on mobile and when mouse is idle)
+    // Autonomous living drift animation loop (throttled for high FPS & low CPU)
     const animateDrift = (time: number) => {
       const now = Date.now();
-      // If user hasn't actively moved cursor/touch in the last 1.8 seconds, drift autonomously
-      if (now - lastHeroInteraction.current > 1800) {
-        const t = time * 0.00085;
-        // Smooth harmonic Lissajous drift
-        const swayX = Math.sin(t * 0.72) * 16;
-        const swayY = Math.cos(t * 0.92) * 14;
+      if (now - lastDriftTick > 32) {
+        lastDriftTick = now;
+        // If user hasn't actively moved cursor/touch in the last 1.8 seconds, drift autonomously
+        if (now - lastHeroInteraction.current > 1800) {
+          const t = time * 0.00085;
+          // Smooth harmonic Lissajous drift
+          const swayX = Math.sin(t * 0.72) * 16;
+          const swayY = Math.cos(t * 0.92) * 14;
 
-        mouseX.set(swayX);
-        mouseY.set(swayY);
+          mouseX.set(swayX);
+          mouseY.set(swayY);
 
-        const w = typeof window !== 'undefined' ? window.innerWidth : 600;
-        const h = typeof window !== 'undefined' ? window.innerHeight : 800;
-        const centerX = w * 0.5;
-        const centerY = h * 0.44;
+          const w = typeof window !== 'undefined' ? window.innerWidth : 600;
+          const h = typeof window !== 'undefined' ? window.innerHeight : 800;
+          const centerX = w * 0.5;
+          const centerY = h * 0.44;
 
-        heroCursorX.set(centerX + Math.sin(t * 0.72) * (w * 0.15));
-        heroCursorY.set(centerY + Math.cos(t * 0.92) * (h * 0.12));
-        setIsHeroCursorVisible(true);
+          heroCursorX.set(centerX + Math.sin(t * 0.72) * (w * 0.15));
+          heroCursorY.set(centerY + Math.cos(t * 0.92) * (h * 0.12));
+          setIsHeroCursorVisible(true);
+        }
       }
 
       animId = requestAnimationFrame(animateDrift);
@@ -628,7 +633,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                 opacity: [0.35, 0.55, 0.35],
               }}
               transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -top-16 left-[10%] w-[380px] sm:w-[500px] h-[380px] sm:h-[500px] rounded-full bg-cyan-400/30 blur-[90px] mix-blend-multiply pointer-events-none"
+              className="absolute -top-16 left-[10%] w-[380px] sm:w-[500px] h-[380px] sm:h-[500px] rounded-full bg-cyan-400/25 blur-3xl will-change-transform pointer-events-none"
             />
 
             {/* Blob 2: Violet / Purple glow top-right */}
@@ -640,7 +645,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                 opacity: [0.3, 0.52, 0.3],
               }}
               transition={{ duration: 18, delay: 2, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -top-20 right-[8%] w-[420px] sm:w-[540px] h-[420px] sm:h-[540px] rounded-full bg-purple-400/28 blur-[95px] mix-blend-multiply pointer-events-none"
+              className="absolute -top-20 right-[8%] w-[420px] sm:w-[540px] h-[420px] sm:h-[540px] rounded-full bg-purple-400/22 blur-3xl will-change-transform pointer-events-none"
             />
 
             {/* Blob 3: Rose / Pink glow bottom-right */}
@@ -652,7 +657,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                 opacity: [0.25, 0.45, 0.25],
               }}
               transition={{ duration: 15, delay: 4, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -bottom-24 right-[16%] w-[380px] sm:w-[480px] h-[380px] sm:h-[480px] rounded-full bg-pink-400/25 blur-[85px] mix-blend-multiply pointer-events-none"
+              className="absolute -bottom-24 right-[16%] w-[380px] sm:w-[480px] h-[380px] sm:h-[480px] rounded-full bg-pink-400/20 blur-3xl will-change-transform pointer-events-none"
             />
 
             {/* Blob 4: Soft Indigo / Blue glow bottom-left */}
@@ -664,7 +669,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                 opacity: [0.28, 0.48, 0.28],
               }}
               transition={{ duration: 17, delay: 1, repeat: Infinity, ease: 'easeInOut' }}
-              className="absolute -bottom-20 left-[12%] w-[400px] sm:w-[500px] h-[400px] sm:h-[500px] rounded-full bg-blue-400/25 blur-[90px] mix-blend-multiply pointer-events-none"
+              className="absolute -bottom-20 left-[12%] w-[400px] sm:w-[500px] h-[400px] sm:h-[500px] rounded-full bg-blue-400/20 blur-3xl will-change-transform pointer-events-none"
             />
           </motion.div>
         )}
@@ -775,6 +780,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                 src="/axiino-logo.png" 
                 alt="Axiino Logo" 
                 className="h-full w-auto object-contain drop-shadow" 
+                decoding="async"
               />
             </div>
             <div className="flex flex-col text-left">
@@ -884,12 +890,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                 shouldReduceMotion
                   ? {}
                   : {
-                      y: [0, -7, 0],
-                      boxShadow: [
-                        '0 10px 25px -5px rgba(88, 28, 135, 0.28), 0 8px 10px -6px rgba(88, 28, 135, 0.2)',
-                        '0 18px 34px -4px rgba(88, 28, 135, 0.42), 0 10px 14px -5px rgba(88, 28, 135, 0.3)',
-                        '0 10px 25px -5px rgba(88, 28, 135, 0.28), 0 8px 10px -6px rgba(88, 28, 135, 0.2)',
-                      ],
+                      y: [0, -6, 0],
                     }
               }
               transition={{
@@ -899,7 +900,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
               }}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-full text-white font-bold text-sm tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-full text-white font-bold text-sm tracking-wide shadow-lg shadow-purple-900/30 hover:shadow-purple-900/45 transition-all flex items-center justify-center gap-2 cursor-pointer will-change-transform"
               style={{ background: 'var(--brand-gradient)' }}
             >
               <span>Open Brochure</span>
@@ -913,12 +914,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                 shouldReduceMotion
                   ? {}
                   : {
-                      y: [0, -7, 0],
-                      boxShadow: [
-                        '0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.06)',
-                        '0 18px 34px -4px rgba(15, 23, 42, 0.14), 0 10px 14px -5px rgba(15, 23, 42, 0.10)',
-                        '0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.06)',
-                      ],
+                      y: [0, -6, 0],
                     }
               }
               transition={{
@@ -928,7 +924,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
               }}
               whileHover={{ scale: 1.04 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full sm:w-auto px-7 py-3.5 rounded-full border border-white/80 bg-white/75 hover:bg-white text-slate-800 font-bold text-sm tracking-wide transition-all flex items-center justify-center gap-2 cursor-pointer backdrop-blur-md"
+              className="w-full sm:w-auto px-7 py-3.5 rounded-full border border-white/80 bg-white/80 hover:bg-white text-slate-800 font-bold text-sm tracking-wide shadow-md shadow-slate-900/10 hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer backdrop-blur-md will-change-transform"
             >
               <span>About & Contact</span>
             </motion.button>
@@ -1005,6 +1001,7 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                 src="/axiino-logo.png" 
                 alt="Axiino Logo" 
                 className="h-full w-auto object-contain drop-shadow-sm" 
+                decoding="async"
               />
             </div>
             <span 
@@ -2469,6 +2466,8 @@ export const ScrollView: React.FC<ScrollViewProps> = ({
                                 src={card.logoUrl || '/axiino-logo.png'}
                                 alt={card.title}
                                 className="w-full h-full object-contain"
+                                loading="lazy"
+                                decoding="async"
                               />
                             </div>
 

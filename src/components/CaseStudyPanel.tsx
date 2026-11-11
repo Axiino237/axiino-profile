@@ -138,7 +138,7 @@ export const CaseStudyPanel: React.FC<CaseStudyPanelProps> = ({
 
           {/* Center Brand Name */}
           <div className="hidden sm:flex items-center gap-2">
-            <img src="/axiino-logo.png" alt="Axiino Logo" className="h-6 w-auto object-contain" />
+            <img src="/axiino-logo.png" alt="Axiino Logo" className="h-6 w-auto object-contain" decoding="async" />
             <span className="font-display font-black text-sm tracking-tight text-white">
               AXIINO
             </span>
@@ -207,6 +207,8 @@ export const CaseStudyPanel: React.FC<CaseStudyPanelProps> = ({
                 src={caseStudy.heroScreenshot}
                 alt={caseStudy.title}
                 className="w-full h-auto object-cover aspect-video"
+                loading="lazy"
+                decoding="async"
               />
             </div>
 
@@ -403,6 +405,8 @@ export const CaseStudyPanel: React.FC<CaseStudyPanelProps> = ({
                   src={currentScreenshot.url}
                   alt={currentScreenshot.caption}
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
 

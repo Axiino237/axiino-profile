@@ -39,6 +39,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 src="/axiino-logo.png"
                 alt="Axiino Logo"
                 className="h-full w-auto object-contain drop-shadow"
+                decoding="async"
               />
             </div>
             <div className="flex flex-col">

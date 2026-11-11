@@ -61,6 +61,8 @@ export const ProjectDetailModal: React.FC<ProjectDetailModalProps> = ({ item, on
                 src={item.screenshotUrl}
                 alt={item.title}
                 className="w-full h-auto max-h-[480px] object-cover object-top transition-transform duration-500 group-hover:scale-[1.01]"
+                loading="lazy"
+                decoding="async"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-60" />
               {item.liveUrl && (

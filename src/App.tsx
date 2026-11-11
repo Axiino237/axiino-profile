@@ -7,9 +7,8 @@ import { SlideBackground } from './components/SlideBackground';
 import { SlideContent } from './components/SlideContent';
 import { SlideCarousel } from './components/SlideCarousel';
 import { SlideControls } from './components/SlideControls';
-import { ProjectDetailScreen } from './components/ProjectDetailScreen';
-import { AdminManagerModal } from './components/AdminManagerModal';
 import { ScrollView } from './components/ScrollView';
+import { ProjectDetailScreen } from './components/ProjectDetailScreen';
 import { TableOfContentsModal } from './components/TableOfContentsModal';
 import { ContactModal } from './components/ContactModal';
 
@@ -18,7 +17,7 @@ const TICK_INTERVAL_MS = 50;
 
 export function App() {
   // Load stored items from local storage if available, fallback to defaults
-  const [items, setItems] = useState<ShowcaseItem[]>(() => {
+  const [items] = useState<ShowcaseItem[]>(() => {
     try {
       const saved = localStorage.getItem('axiino_showcase_items');
       if (saved) {
@@ -163,20 +162,6 @@ export function App() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [viewMode, selectedDetailItem, isAdminOpen, isIndexOpen, isContactOpen, filteredItems.length]);
 
-  // Save updated items from Admin
-  const handleSaveItems = (updatedItems: ShowcaseItem[]) => {
-    setItems(updatedItems);
-    try {
-      localStorage.setItem('axiino_showcase_items', JSON.stringify(updatedItems));
-    } catch (e) {
-      console.error(e);
-    }
-  };
-
-  const handleResetDefaults = () => {
-    localStorage.removeItem('axiino_showcase_items');
-    setItems(SHOWCASE_ITEMS);
-  };
 
   return (
     <div className="relative w-screen min-h-[100dvh] bg-[#E6EFF8] font-sans">
@@ -297,15 +282,6 @@ export function App() {
       <ContactModal
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}
-      />
-
-      {/* 6. Admin Content & Management Modal */}
-      <AdminManagerModal
-        isOpen={isAdminOpen}
-        onClose={() => setIsAdminOpen(false)}
-        items={items}
-        onSaveItems={handleSaveItems}
-        onResetDefaults={handleResetDefaults}
       />
     </div>
   );

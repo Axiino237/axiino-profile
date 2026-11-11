@@ -111,6 +111,8 @@ export const ProjectDetailScreen: React.FC<ProjectDetailScreenProps> = ({ item, 
             src={item.screenshotUrl}
             alt={item.title}
             className="w-full h-auto object-cover object-top transition-transform duration-700 group-hover:scale-[1.01]"
+            loading="lazy"
+            decoding="async"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-transparent opacity-40 pointer-events-none" />
           
